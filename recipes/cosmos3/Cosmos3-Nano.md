@@ -129,7 +129,7 @@ Tested environment:
 - Guardrails: disabled with `--no-guardrails`
 
 ```bash
-TORCHDYNAMO_DISABLE=1 VLLM_TEST_FORCE_FP8_MARLIN=1 \
+TORCHDYNAMO_DISABLE=1 \
 vllm serve nvidia/Cosmos3-Nano \
   --omni \
   --no-guardrails \
@@ -150,17 +150,17 @@ Validation run:
 
 | Metric | Value |
 |---|---:|
-| Server ready time | 402.2 s |
-| T2I request latency | 18.72 s |
+| Server ready time | 303.6 s |
+| T2I request latency | 17.47 s |
 | Startup peak VRAM | 15.65 GiB |
-| Startup WSL RAM | 19.78 GiB |
+| Startup WSL RAM | 19.55 GiB |
 | Response | HTTP 200, valid 1024x1024 PNG |
 
 Notes:
 
 - `TORCHDYNAMO_DISABLE=1` avoids an observed Torch Dynamo/Inductor compile
   failure in the online per-block FP8 cast path.
-- `VLLM_TEST_FORCE_FP8_MARLIN=1` selects the Marlin weight-only FP8 path on this
+- `--linear-backend marlin` keeps explicit Marlin backend selection on this
   Ada-class GPU.
 - The WSL2 memory cap matters: a smaller local WSL memory envelope around
   15 GiB killed the diffusion worker during startup.
