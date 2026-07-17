@@ -134,10 +134,10 @@ vllm serve nvidia/Cosmos3-Nano \
   --omni \
   --no-guardrails \
   --enable-layerwise-offload \
+  --disable-multithread-weight-load \
   --cpu-offload-gb 4 \
-  --quantization online \
+  --quantization fp8_per_block \
   --gpu-memory-utilization 0.60 \
-  --diffusion-quantization-config '{"linear":"fp8_per_block"}' \
   --vae-use-slicing \
   --vae-use-tiling \
   --host 0.0.0.0 \
@@ -149,9 +149,9 @@ Validation run:
 
 | Metric | Value |
 |---|---:|
-| Server ready time | 303.6 s |
-| T2I request latency | 17.47 s |
-| Startup peak VRAM | 15.65 GiB |
+| Server ready time | 414.9 s |
+| T2I request latency | 19.77 s |
+| Startup peak VRAM | 15.62 GiB |
 | Startup WSL RAM | 19.55 GiB |
 | Response | HTTP 200, valid 1024x1024 PNG |
 
@@ -159,6 +159,8 @@ Notes:
 
 - `TORCHDYNAMO_DISABLE=1` avoids an observed Torch Dynamo/Inductor compile
   failure in the online per-block FP8 cast path.
+- `--disable-multithread-weight-load` limits concurrent host allocations while
+  loading model shards in the constrained WSL2 memory envelope.
 - The WSL2 memory cap matters: a smaller local WSL memory envelope around
   15 GiB killed the diffusion worker during startup.
 - Output quality and prompt following should still be evaluated separately for
